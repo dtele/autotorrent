@@ -63,12 +63,13 @@ options.add_experimental_option('excludeSwitches', ['enable-logging'])
 driver = webdriver.Chrome(options=options)
 
 results = torrent_search(args.search_term, args.rows)
+rows = len(results)
 
 # TODO: fix this shit later lol
-parsed_results = [['sno'] + [str(row + 1) for row in range(args.rows)]] + [[parameter] + [torrent.__getattribute__(parameter) for torrent in results] for parameter in ['name', 'seeders', 'leechers', 'size']]
+parsed_results = [['sno'] + [str(row + 1) for row in range(rows)]] + [[parameter] + [torrent.__getattribute__(parameter) for torrent in results] for parameter in ['name', 'seeders', 'leechers', 'size']]
 max_lens = [max(map(len, col)) for col in parsed_results]
 
-for row in range(args.rows + 1):
+for row in range(rows + 1):
     for pos, col in enumerate(parsed_results):
         space_balance = ' ' * (max_lens[pos] - len(col[row]) + 4)
         print(col[row] + space_balance, end='')
