@@ -10,8 +10,9 @@ Do any of the following:
 - Download latest release from [releases](https://github.com/dtele/autotorrent/releases)
 - Build it yourself:
     1. download compatible [chromedriver](https://chromedriver.chromium.org/downloads)
-    2. `pip install selenium`
-    3. `pyinstaller /path/to/main.py --onefile --add-binary "/path/to/chromedriver.exe;./driver" -n "tdl"`
+    2. `pip install pyinstaller`
+    3. `pip install selenium`
+    4. `pyinstaller /path/to/main.py --onefile --add-binary "/path/to/chromedriver.exe;./driver" -n "tdl"`
 
 Split Tunnelling can be set-up in VPN settings by including chrome.exe through VPN Tunnel.
 
