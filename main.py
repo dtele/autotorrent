@@ -1,8 +1,10 @@
 import argparse
 import webbrowser
+from sys import exit as sysexit
 from typing import List
 from urllib.parse import quote_plus
 
+from pyperclip import copy
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 
@@ -29,13 +31,13 @@ class Torrent:
         return None
 
 
-def torrent_search(search_term: str, rows: int = 10) -> List[Torrent]:
+def torrent_search(search_term: str, rows: int = 10, proxy: str = '1337x.to') -> List[Torrent]:
     search_term = quote_plus(search_term)
     final_results = []
     page = 1
 
     while len(final_results) < rows:
-        driver.get(fr'https://1337x.to/search/{search_term}/{page}/')
+        driver.get(fr'https://{proxy}/search/{search_term}/{page}/')
         page_results = driver.find_elements(By.TAG_NAME, 'tr')[1:]
         page += 1
 
@@ -54,6 +56,7 @@ def torrent_search(search_term: str, rows: int = 10) -> List[Torrent]:
 parser = argparse.ArgumentParser()
 parser.add_argument('search_term', action='store')
 parser.add_argument('rows', action='store', type=int)
+parser.add_argument('--copy', default=False, action=argparse.BooleanOptionalAction)
 args = parser.parse_args()
 
 options = webdriver.ChromeOptions()
@@ -62,7 +65,22 @@ options.add_experimental_option('excludeSwitches', ['enable-logging'])
 
 driver = webdriver.Chrome(options=options)
 
-results = torrent_search(args.search_term, args.rows)
+proxies = ['1337x.to', '1337xto.to', '1377x.to', '1337xx.to', '1337x.gd']
+results = ''
+
+for proxy in proxies:
+    try:
+        results = torrent_search(args.search_term, args.rows, proxy)
+    except Exception as e:
+        print(e)
+        continue
+    finally:
+        break
+
+if results == '':
+    print('Request timed out')
+    sysexit()
+
 rows = len(results)
 
 # TODO: fix this shit later lol
@@ -77,6 +95,12 @@ for row in range(rows + 1):
 
 download = int(input('Download\n>> '))
 magnet = results[download - 1].get_magnet()
-webbrowser.open(magnet)
+
+if not args.copy:
+    webbrowser.open(magnet)
+    print("\nMagnet opened in browser.")
+else:
+    copy(magnet)
+    print('\nMagnet copied to clipboard.')
 
 driver.quit()
